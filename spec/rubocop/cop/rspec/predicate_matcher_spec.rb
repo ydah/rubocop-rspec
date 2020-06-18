@@ -11,7 +11,7 @@ RSpec.describe RuboCop::Cop::RSpec::PredicateMatcher, :config do
   context 'when enforced style is `inflected`' do
     let(:enforced_style) { 'inflected' }
 
-    it 'registers an offense for a predicate method in actual' do
+    it 'flags a predicate method in expectation' do
       expect_offense(<<-RUBY)
         expect(foo.empty?).to be_truthy
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer using `be_empty` matcher over `empty?`.
@@ -21,26 +21,40 @@ RSpec.describe RuboCop::Cop::RSpec::PredicateMatcher, :config do
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer using `be_empty` matcher over `empty?`.
         expect(foo.empty?).to be_falsey
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer using `be_empty` matcher over `empty?`.
-      RUBY
-    end
-
-    it 'registers an offense for a predicate method with built-in equiv' do
-      expect_offense(<<-RUBY)
         expect(foo.exist?).to be_truthy
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer using `exist` matcher over `exist?`.
         expect(foo.exists?).to be_truthy
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer using `exist` matcher over `exists?`.
         expect(foo.has_something?).to be_truthy
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer using `have_something` matcher over `has_something?`.
+      RUBY
+    end
+
+    include_examples 'autocorrect',
+                     'expect(foo.empty?).to be_truthy',
+                     'expect(foo).to be_empty'
+    include_examples 'autocorrect',
+                     'expect(foo.empty?).not_to be_truthy',
+                     'expect(foo).not_to be_empty'
+    include_examples 'autocorrect',
+                     'expect(foo.empty?).to_not be_truthy',
+                     'expect(foo).not_to be_empty'
+    include_examples 'autocorrect',
+                     'expect(foo.empty?).to be_falsey',
+                     'expect(foo).not_to be_empty'
+    include_examples 'autocorrect',
+                     'expect(foo.empty?).not_to be_falsey',
+                     'expect(foo).to be_empty'
+    include_examples 'autocorrect',
+                     'expect(foo.empty?).not_to a_truthy_value',
+                     'expect(foo).not_to be_empty'
+
+    it 'flags a predicate method with argument' do
+      expect_offense(<<-RUBY)
         expect(foo.include?(something)).to be_truthy
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer using `include` matcher over `include?`.
         expect(foo.respond_to?(:bar)).to be_truthy
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer using `respond_to` matcher over `respond_to?`.
-      RUBY
-    end
-
-    it 'registers an offense for a predicate method with argument' do
-      expect_offense(<<-RUBY)
         expect(foo.something?('foo')).to be_truthy
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer using `be_something` matcher over `something?`.
         expect(foo.something?('foo', 'bar')).to be_truthy
@@ -76,25 +90,6 @@ RSpec.describe RuboCop::Cop::RSpec::PredicateMatcher, :config do
         expect(foo.has_something).to be(true)
       RUBY
     end
-
-    include_examples 'autocorrect',
-                     'expect(foo.empty?).to be_truthy',
-                     'expect(foo).to be_empty'
-    include_examples 'autocorrect',
-                     'expect(foo.empty?).not_to be_truthy',
-                     'expect(foo).not_to be_empty'
-    include_examples 'autocorrect',
-                     'expect(foo.empty?).to_not be_truthy',
-                     'expect(foo).not_to be_empty'
-    include_examples 'autocorrect',
-                     'expect(foo.empty?).to be_falsey',
-                     'expect(foo).not_to be_empty'
-    include_examples 'autocorrect',
-                     'expect(foo.empty?).not_to be_falsey',
-                     'expect(foo).to be_empty'
-    include_examples 'autocorrect',
-                     'expect(foo.empty?).not_to a_truthy_value',
-                     'expect(foo).not_to be_empty'
 
     include_examples 'autocorrect',
                      'expect(foo.is_a?(Array)).to be_truthy',
