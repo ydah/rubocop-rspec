@@ -4,6 +4,7 @@
 
 * Fix `RSpec/FactoryBot/SyntaxMethods` and `RSpec/Capybara/FeatureMethods` to inspect shared groups. ([@pirj][])
 * Fix `RSpec/LeadingSubject` failure in non-spec code. ([@pirj][])
+* Replace non-styleguide cops `StyleGuide` attribute with `Reference`. ([@pirj][])
 
 ## 2.7.0 (2021-12-26)
 
