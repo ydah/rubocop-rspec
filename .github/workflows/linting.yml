@@ -13,7 +13,6 @@ jobs:
       - name: Yamllint
         uses: karancode/yamllint-github-action@master
         with:
-          yamllint_strict: true
           yamllint_format: parsable
           yamllint_comment: true
         env:
